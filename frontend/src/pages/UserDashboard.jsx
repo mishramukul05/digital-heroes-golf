@@ -59,9 +59,18 @@ const UserDashboard = () => {
           console.error("Error fetching charities", err);
         }
       };
+      
       fetchScores();
       fetchWinnings();
       fetchStats();
+      fetchCharities();
+    }, [userId, API_URL]);
+
+  const handleUpdateCharity = async (charityId, percentage) => {
+    try {
+      setUpdatingCharity(true);
+      await axios.put(`${API_URL}/api/charities/select`, { charityId, percentage: percentage || 10 }, { withCredentials: true });
+      await checkUser();
       setIsEditingCharity(false);
     } catch (err) {
       console.error("Error updating charity", err);
