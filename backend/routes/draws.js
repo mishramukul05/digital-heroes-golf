@@ -37,10 +37,7 @@ router.post('/run', isAdmin, async (req, res) => {
     const userScores = await Promise.all(
       activeUsers.map(async (user) => {
         const scores = await Score.find({ userId: user._id })
-          .sort({ date: -1 })
-          .limit(5);
-        return { user, scores: scores.map(s => s.score) };
-      })
+            .sort({ date: -1, _id: -1 })
     );
 
     // Step 3 & 4: Compare scores and filter winners
@@ -49,18 +46,33 @@ router.post('/run', isAdmin, async (req, res) => {
     const match3 = [];
 
     userScores.forEach(({ user, scores }) => {
-      const matches = scores.filter(score => winningNumbers.includes(score)).length;
+      // Ensure golf scores count distinctly vs the distinct winning numbers pool
+      const uniqueScores = [...new Set(scores)];
+      const matches = uniqueScores.filter(score => winningNumbers.includes(score)).length;
       if (matches === 5) match5.push(user);
       else if (matches === 4) match4.push(user);
       else if (matches === 3) match3.push(user);
     });
 
     // Step 5: Calculate prize pool distribution
-    const totalPrizePool = 10000;
+    // A fixed portion per active user goes into base pool. Default seeded to 1000 for empty databases.
+    const basePrizePool = activeUsers.length > 0 ? activeUsers.length * 5 : 1000;
+    
+    const lastPublishedDraw = await Draw.findOne({ status: 'published' }).sort({ createdAt: -1 });
+    let rolloverAmount = 0;
+    if (lastPublishedDraw && !lastPublishedDraw.jackpotClaimed) {
+      rolloverAmount = (lastPublishedDraw.basePrizePool * 0.40) + (lastPublishedDraw.rolloverAmount || 0);
+    }
+    const currentJackpotPot = (basePrizePool * 0.40) + rolloverAmount;
+    const currentMatch4Pot = (basePrizePool * 0.35);
+    const currentMatch3Pot = (basePrizePool * 0.25);
+    
+    const totalPrizePool = basePrizePool + rolloverAmount;
+
     const prizeTier = {
-      match5: match5.length > 0 ? (totalPrizePool * 0.40) / match5.length : 0,
-      match4: match4.length > 0 ? (totalPrizePool * 0.35) / match4.length : 0,
-      match3: match3.length > 0 ? (totalPrizePool * 0.25) / match3.length : 0,
+      match5: match5.length > 0 ? currentJackpotPot / match5.length : 0,
+      match4: match4.length > 0 ? currentMatch4Pot / match4.length : 0,
+      match3: match3.length > 0 ? currentMatch3Pot / match3.length : 0,
     };
     
     const winners = [
@@ -75,6 +87,9 @@ router.post('/run', isAdmin, async (req, res) => {
       month,
       winningNumbers,
       prizePoolTotal: totalPrizePool,
+      basePrizePool,
+      rolloverAmount,
+      jackpotClaimed: match5.length > 0,
       status: 'simulation',
       winners,
     });
@@ -152,6 +167,48 @@ router.get('/user/:userId/winnings', async (req, res) => {
   } catch (error) {
     console.error('Error fetching user winnings', error);
     res.status(500).json({ error: 'Server error retrieving winnings.' });
+  }
+});
+
+// PUT /api/draws/verify-audit/:drawId/:winnerId - Admin approves/rejects/pays a winner
+router.put('/verify-audit/:drawId/:winnerId', isAdmin, async (req, res) => {
+  const { drawId, winnerId } = req.params;
+  const { status } = req.body; // 'approved', 'rejected', 'paid'
+
+  if (!['approved', 'rejected', 'paid'].includes(status)) {
+    return res.status(400).json({ error: 'Invalid sort status' });
+  }
+
+  try {
+    const draw = await Draw.findById(drawId);
+    if (!draw) return res.status(404).json({ error: 'Draw not found.' });
+
+    const winner = draw.winners.id(winnerId); // Since subdocuments have _id
+    if (!winner) return res.status(404).json({ error: 'Winner not found.' });
+
+    winner.verificationStatus = status;
+    await draw.save();
+
+    res.json({ message: `Winner status updated to ${status}`, winner });
+  } catch (error) {
+    console.error('Error auditing winner:', error);
+    res.status(500).json({ error: 'Server error while auditing winner.' });
+  }
+});
+
+// PUT /api/draws/publish/:drawId - Admin publishes simulation logic
+router.put('/publish/:drawId', isAdmin, async (req, res) => {
+  try {
+    const draw = await Draw.findById(req.params.drawId);
+    if (!draw) return res.status(404).json({ error: 'Draw not found' });
+    
+    draw.status = 'published';
+    await draw.save();
+    
+    res.json({ message: 'Draw published successfully', draw });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Server Error' });
   }
 });
 

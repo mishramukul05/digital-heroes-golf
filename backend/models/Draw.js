@@ -6,6 +6,9 @@ const drawSchema = new Schema({
   month: { type: String, required: true }, // e.g., "YYYY-MM"
   winningNumbers: { type: [Number], required: true }, // Array of 5 numbers
   prizePoolTotal: { type: Number, required: true },
+  basePrizePool: { type: Number, default: 0 },
+  rolloverAmount: { type: Number, default: 0 },
+  jackpotClaimed: { type: Boolean, default: false },
   status: {
     type: String,
     enum: ['simulation', 'published'],
