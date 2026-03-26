@@ -150,4 +150,37 @@ router.put('/draws/:drawId/approve', isAdmin, async (req, res) => {
   }
 });
 
+// PUT /api/admin/users/:id - Edit user profile info/subscription
+router.put('/users/:id', isAdmin, async (req, res) => {
+  try {
+    const { name, email, subscriptionStatus } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (subscriptionStatus) user.subscriptionStatus = subscriptionStatus;
+    await user.save();
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: 'Error updating user' });
+  }
+});
+
+// PUT /api/admin/charities/:id - Edit a charity
+router.put('/charities/:id', isAdmin, async (req, res) => {
+  try {
+    const { name, description, imageUrl, isActive } = req.body;
+    const charity = await Charity.findById(req.params.id);
+    if (!charity) return res.status(404).json({ error: 'Charity not found' });
+    if (name) charity.name = name;
+    if (description) charity.description = description;
+    if (imageUrl) charity.imageUrl = imageUrl;
+    if (isActive !== undefined) charity.isActive = isActive;
+    await charity.save();
+    res.json(charity);
+  } catch (err) {
+    res.status(500).json({ error: 'Error updating charity' });
+  }
+});
+
 module.exports = router;

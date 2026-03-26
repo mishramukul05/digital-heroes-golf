@@ -54,4 +54,39 @@ router.get('/:userId', verifyToken, async (req, res) => {
     }
 });
 
+// PUT /api/scores/:id - Admin can edit a score
+router.put('/:id', verifyToken, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden' });
+        }
+        const { score } = req.body;
+        if (score < 1 || score > 45) {
+            return res.status(400).json({ message: 'Score must be between 1 and 45' });
+        }
+        
+        const existingScore = await Score.findById(req.params.id);
+        if (!existingScore) return res.status(404).json({ message: 'Score not found' });
+        
+        existingScore.score = score;
+        await existingScore.save();
+        res.json(existingScore);
+    } catch (err) {
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
+
+// DELETE /api/scores/:id - Admin can delete a score
+router.delete('/:id', verifyToken, async (req, res) => {
+    try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({ message: 'Forbidden' });
+        }
+        await Score.findByIdAndDelete(req.params.id);
+        res.json({ message: 'Score deleted' });
+    } catch (err) {
+        res.status(500).json({ message: 'Server Error' });
+    }
+});
+
 module.exports = router;
