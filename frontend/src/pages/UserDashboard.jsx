@@ -300,9 +300,9 @@ const UserDashboard = () => {
               ) : (
                 <div className="space-y-4">
                   <p className="text-sm text-slate-400 leading-relaxed font-medium">
-                    You haven't selected a charity yet. Choose where your <span className="text-rose-400 font-bold">10%</span> goes!
+                    You haven't selected a charity yet. Choose where your contribution goes!
                   </p>
-                  <select 
+                  <select
                     value={selectedCharity}
                     onChange={(e) => setSelectedCharity(e.target.value)}
                     className="w-full bg-slate-900 border border-slate-600 rounded-lg p-2 text-slate-200 focus:outline-none focus:border-cyan-500"
@@ -312,8 +312,25 @@ const UserDashboard = () => {
                       <option key={c._id} value={c._id}>{c.name}</option>
                     ))}
                   </select>
-                  <button 
-                    onClick={() => handleUpdateCharity(selectedCharity)}
+
+                  <div className="space-y-2">
+                    <label className="text-sm text-slate-400 font-medium flex justify-between">
+                      <span>Contribution Percentage</span>
+                      <span className="text-cyan-400 font-bold">{charityPercentage}%</span>
+                    </label>
+                    <input
+                      type="range"
+                      min="1"
+                      max="100"
+                      value={charityPercentage}
+                      onChange={(e) => setCharityPercentage(Number(e.target.value))}
+                      className="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+                    />
+                    <p className="text-xs text-slate-500 text-center">Choose how much of your subscription goes to charity.</p>
+                  </div>
+
+                  <button
+                    onClick={() => handleUpdateCharity(selectedCharity, charityPercentage)}
                     disabled={!selectedCharity || updatingCharity}
                     className="w-full bg-gradient-to-r from-rose-600 to-pink-600 hover:from-rose-500 hover:to-pink-500 disabled:opacity-50 text-white font-bold py-2 rounded-xl transition-all shadow-lg"
                   >
