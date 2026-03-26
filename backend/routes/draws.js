@@ -38,6 +38,9 @@ router.post('/run', isAdmin, async (req, res) => {
       activeUsers.map(async (user) => {
         const scores = await Score.find({ userId: user._id })
             .sort({ date: -1, _id: -1 })
+            .limit(5);
+        return { user, scores: scores.map(s => s.score) };
+      })
     );
 
     // Step 3 & 4: Compare scores and filter winners
