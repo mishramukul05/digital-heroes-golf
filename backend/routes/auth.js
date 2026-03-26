@@ -40,11 +40,8 @@ router.post('/register', async (req, res) => {
     // Set token in HttpOnly cookie
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days in milliseconds
-    });
-
+        secure: true, // MUST be true for cross-domain Vercel to Render
+        sameSite: 'none', // MUST be 'none' for cross-domain cookie sharing
     res.status(201).json({ 
       id: user._id, 
       userId: user._id, 
@@ -89,11 +86,8 @@ router.post('/login', async (req, res) => {
     // Set token in HttpOnly cookie
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000
-    });
-
+        secure: true,
+        sameSite: 'none',
     res.json({ 
       id: user._id, 
       userId: user._id, 
