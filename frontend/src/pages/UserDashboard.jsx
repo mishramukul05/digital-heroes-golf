@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Activity, Trophy, Heart, CreditCard, UploadCloud, FileCheck, Ghost, Frown, Sparkles, FolderOpen } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { motion } from 'framer-motion';
 
 const UserDashboard = () => {
   const { user, checkUser } = useAuth();
@@ -151,21 +152,31 @@ const UserDashboard = () => {
   return (
     <div className="min-h-screen bg-slate-900 text-slate-50 p-8">
       <div className="max-w-6xl mx-auto space-y-8">
-        
-        <header className="mb-10">
+
+        <motion.header 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-10"
+        >
           <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
             Player Dashboard
           </h1>
           <p className="text-slate-400 mt-2">Track your performance. Fund your cause.</p>
-        </header>
+        </motion.header>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          
+
           {/* Left Column: Score Entry & History */}
           <div className="md:col-span-2 space-y-8">
-            
+
             {/* Enter Score Card */}
-            <div className="bg-slate-800 p-6 rounded-3xl border border-slate-700 shadow-xl hover:-translate-y-1 hover:border-slate-500 transition-all duration-300">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="bg-slate-800 p-6 rounded-3xl border border-slate-700 shadow-xl hover:-translate-y-1 hover:border-slate-500 transition-all duration-300"
+            >
               <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
                 <Activity className="text-blue-400" /> Log New Score
               </h2>
@@ -190,10 +201,14 @@ const UserDashboard = () => {
                 </button>
               </form>
               {error && <p className="text-red-400 mt-3 text-sm flex items-center gap-2"><Frown size={16} />{error}</p>}
-            </div>
-
+            </motion.div>
             {/* Recent Scores List */}
-            <div className="bg-slate-800 p-6 rounded-3xl border border-slate-700 shadow-xl hover:-translate-y-1 hover:border-slate-500 transition-all duration-300">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="bg-slate-800 p-6 rounded-3xl border border-slate-700 shadow-xl hover:-translate-y-1 hover:border-slate-500 transition-all duration-300"
+            >
               <h2 className="text-xl font-semibold mb-2 text-slate-200">Your Rolling 5 Scores</h2>
               <p className="text-sm text-slate-400 mb-6">Only your 5 most recent rounds are kept for the monthly draw.</p>
               
@@ -215,7 +230,7 @@ const UserDashboard = () => {
                   ))}
                 </div>
               )}
-            </div>
+            </motion.div>
 
             {/* Winnings & Verification Section */}
             <WinningsVerification 
@@ -231,7 +246,12 @@ const UserDashboard = () => {
           {/* Right Column: Summaries */}
           <div className="space-y-8">
             {/* Charity Status */}
-            <div className="bg-gradient-to-br from-slate-800 to-slate-800/50 p-6 rounded-3xl border border-slate-700 shadow-xl hover:-translate-y-1 hover:border-slate-500 transition-all duration-300">
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="bg-gradient-to-br from-slate-800 to-slate-800/50 p-6 rounded-3xl border border-slate-700 shadow-xl hover:-translate-y-1 hover:border-slate-500 transition-all duration-300"
+            >
               <div className="flex justify-between items-start mb-3">
                 <h3 className="text-lg font-semibold flex items-center gap-2 text-slate-200">
                   <Heart className="text-rose-400 drop-shadow-[0_0_8px_rgba(251,113,133,0.5)]" size={22}/> Given Back
@@ -338,9 +358,14 @@ const UserDashboard = () => {
                   </button>
                 </div>
               )}
-            </div>
+            </motion.div>
             {/* Winnings Status */}
-            <div className="bg-slate-800 p-6 rounded-3xl border border-slate-700 shadow-xl hover:-translate-y-1 hover:border-slate-500 transition-all duration-300">
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="bg-slate-800 p-6 rounded-3xl border border-slate-700 shadow-xl hover:-translate-y-1 hover:border-slate-500 transition-all duration-300"
+            >
                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-slate-200">
                 <Trophy className="text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.5)]" size={22}/> Monthly Draws
               </h3>
@@ -362,10 +387,15 @@ const UserDashboard = () => {
                   </span>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
             {/* Subscription Status */}
-            <div className="bg-slate-800 p-6 rounded-3xl border border-slate-700 shadow-xl hover:-translate-y-1 hover:border-slate-500 transition-all duration-300">
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+              className="bg-slate-800 p-6 rounded-3xl border border-slate-700 shadow-xl hover:-translate-y-1 hover:border-slate-500 transition-all duration-300"
+            >
                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-slate-200">
                 <CreditCard className="text-blue-400 drop-shadow-[0_0_8px_rgba(96,165,250,0.5)]" size={22}/> Subscription
               </h3>
@@ -401,7 +431,7 @@ const UserDashboard = () => {
                   </p>
                 )}
               </div>
-            </div>
+            </motion.div>
           </div>
 
         </div>
