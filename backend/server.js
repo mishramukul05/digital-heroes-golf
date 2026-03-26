@@ -13,7 +13,10 @@ app.use('/api/payment/webhook', express.raw({ type: 'application/json' }), requi
 app.use(express.json()); // Parses incoming JSON requests
 app.use(cookieParser()); // Parses cookies
 
-app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
+app.use(cors({ 
+  origin: ['http://localhost:5173', 'https://digital-heroes-golf-drab.vercel.app', process.env.FRONTEND_URL], 
+  credentials: true 
+}));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
