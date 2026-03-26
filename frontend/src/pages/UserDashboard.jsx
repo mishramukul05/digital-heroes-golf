@@ -9,6 +9,7 @@ const UserDashboard = () => {
   const [newScore, setNewScore] = useState('');
   const [error, setError] = useState('');
   const [winnings, setWinnings] = useState([]);
+  const [stats, setStats] = useState({ drawsEntered: 0 });
   const [charities, setCharities] = useState([]);
   const [selectedCharity, setSelectedCharity] = useState('');
   const [charityPercentage, setCharityPercentage] = useState(user?.charityPercentage || 10);
@@ -42,24 +43,25 @@ const UserDashboard = () => {
         console.error("Error fetching winnings", err);
       }
     };
-    const fetchCharities = async () => {
-      try {
-        const res = await axios.get(`${API_URL}/api/charities`);
-        setCharities(res.data);
-      } catch (err) {
-        console.error("Error fetching charities", err);
-      }
-    };
-    fetchScores();
-    fetchWinnings();
-    fetchCharities();
-  }, [userId, API_URL]);
-
-  const handleUpdateCharity = async (charityId, percentage) => {
-    try {
-      setUpdatingCharity(true);
-      await axios.put(`${API_URL}/api/charities/select`, { charityId, percentage: percentage || 10 }, { withCredentials: true });
-      await checkUser();
+      const fetchStats = async () => {
+        try {
+          const res = await axios.get(`${API_URL}/api/draws/user/${userId}/stats`);
+          setStats(res.data);
+        } catch (err) {
+          console.error("Error fetching stats", err);
+        }
+      };
+      const fetchCharities = async () => {
+        try {
+          const res = await axios.get(`${API_URL}/api/charities`);
+          setCharities(res.data);
+        } catch (err) {
+          console.error("Error fetching charities", err);
+        }
+      };
+      fetchScores();
+      fetchWinnings();
+      fetchStats();
       setIsEditingCharity(false);
     } catch (err) {
       console.error("Error updating charity", err);
@@ -319,15 +321,19 @@ const UserDashboard = () => {
               <div className="mt-4 space-y-4">
                 <div className="flex justify-between items-center border-b border-slate-700/60 pb-3">
                   <span className="text-slate-400 font-medium">Draws Entered</span>
-                  <span className="font-bold text-lg text-slate-100">3</span>
+                  <span className="font-bold text-lg text-slate-100">{stats?.drawsEntered || 0}</span>
                 </div>
                 <div className="flex justify-between items-center border-b border-slate-700/60 pb-3 group cursor-default">
                   <span className="text-slate-400 font-medium group-hover:text-emerald-400 transition-colors duration-300">Total Won</span>
-                  <span className="font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 group-hover:scale-110 transition-transform duration-300">$0.00</span>
+                  <span className="font-bold text-lg text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 group-hover:scale-110 transition-transform duration-300">
+                    ${winnings.reduce((sum, win) => sum + win.prizeAmount, 0).toFixed(2)}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center pt-1">
                   <span className="text-slate-400 font-medium">Next Draw</span>
-                  <span className="font-semibold text-blue-400 bg-blue-500/10 px-3 py-1 rounded-full text-sm">In 5 days</span>
+                  <span className="font-semibold text-blue-400 bg-blue-500/10 px-3 py-1 rounded-full text-sm">
+                    {Math.ceil((new Date(new Date().getFullYear(), new Date().getMonth() + 1, 1) - new Date()) / (1000 * 60 * 60 * 24))} Days
+                  </span>
                 </div>
               </div>
             </div>
