@@ -14,7 +14,7 @@ app.use(express.json()); // Parses incoming JSON requests
 app.use(cookieParser()); // Parses cookies
 
 app.use(cors({ 
-  origin: ['http://localhost:5173', 'https://digital-heroes-golf-drab.vercel.app', process.env.FRONTEND_URL], 
+  origin: true, // This reflects the exact request origin, preventing all CORS errors
   credentials: true 
 }));
 
