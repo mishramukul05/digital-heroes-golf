@@ -2,12 +2,18 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 
+// Stripe Webhook needs raw body
+app.use('/api/payment/webhook', express.raw({ type: 'application/json' }), require('./routes/paymentWebhook'));
+
 // Middleware
 app.use(express.json()); // Parses incoming JSON requests
-app.use(cors()); // Allows your React frontend to communicate with this backend
+app.use(cookieParser()); // Parses cookies
+
+app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
@@ -17,6 +23,10 @@ mongoose.connect(process.env.MONGO_URI)
 // Routes
 app.use('/api/scores', require('./routes/scores'));
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/draws', require('./routes/draws'));
+app.use('/api/admin', require('./routes/admin'));
+app.use('/api/payment', require('./routes/payment'));
+app.use('/api/charities', require('./routes/charities'));
 
 // Basic health check route
 app.get('/', (req, res) => {

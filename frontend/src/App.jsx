@@ -1,31 +1,46 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
-import Login from './pages/Login';
+import UserAuth from './pages/UserAuth';
+import AdminAuth from './pages/AdminAuth';
 import UserDashboard from './pages/UserDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import SubscriptionWall from './components/SubscriptionWall';
+import Navbar from './components/Navbar';
+
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
     <Router>
-      <div className="bg-slate-900 min-h-screen text-white">
-        <nav className="bg-slate-800 p-4">
-          <div className="container mx-auto flex justify-between">
-            <Link to="/" className="text-2xl font-bold text-cyan-400">Digital Heroes Golf</Link>
-            <div className="flex space-x-4">
-              <Link to="/" className="hover:text-cyan-300">Home</Link>
-              <Link to="/login" className="hover:text-cyan-300">Login</Link>
-              <Link to="/dashboard" className="hover:text-cyan-300">Dashboard</Link>
-              <Link to="/admin" className="hover:text-cyan-300">Admin</Link>
-            </div>
-          </div>
-        </nav>
-        <main className="container mx-auto p-4">
+      <div className="bg-slate-900 min-h-screen text-slate-50 font-sans selection:bg-blue-500/30">
+        <Navbar />
+
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 animate-in fade-in duration-500">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<UserDashboard />} />
-            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/login" element={<UserAuth />} />
+            <Route path="/admin-login" element={<AdminAuth />} />
+            
+            <Route 
+              path="/dashboard" 
+              element={
+                <ProtectedRoute>
+                  <SubscriptionWall>
+                    <UserDashboard />
+                  </SubscriptionWall>
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/admin" 
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AdminDashboard />
+                </ProtectedRoute>
+              } 
+            />
           </Routes>
         </main>
       </div>
