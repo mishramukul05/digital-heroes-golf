@@ -6,17 +6,18 @@ const cookieParser = require('cookie-parser');
 
 const app = express();
 
-// Stripe Webhook needs raw body
-app.use('/api/payment/webhook', express.raw({ type: 'application/json' }), require('./routes/paymentWebhook'));
-
 // Middleware
-app.use(express.json()); // Parses incoming JSON requests
-app.use(cookieParser()); // Parses cookies
-
 app.use(cors({ 
-  origin: true, // This reflects the exact request origin, preventing all CORS errors
+  origin: true, 
   credentials: true 
 }));
+app.use(cookieParser());
+
+// Stripe Webhook needs raw body, so it must be configured before express.json()
+app.use('/api/payment/webhook', express.raw({ type: 'application/json' }), require('./routes/paymentWebhook'));
+
+// This must come AFTER the webhook route
+app.use(express.json());
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 5000 })

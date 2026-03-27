@@ -1,4 +1,5 @@
-﻿const express = require('express');
+const fs = require('fs');
+const content = "const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -294,4 +295,5 @@ router.put('/upgrade/:id', verifyToken, async (req, res) => {
   }
 });
 
-module.exports = router;
+module.exports = router;"
+fs.writeFileSync('backend/routes/auth.js', content, 'utf8');

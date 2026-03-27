@@ -107,7 +107,7 @@ router.post('/run', isAdmin, async (req, res) => {
 
   } catch (error) {
     console.error('Error running draw simulation:', error);
-    res.status(500).json({ error: 'Server error while running draw simulation.' });
+    res.status(500).json({ error: 'Server error while running draw.' });
   }
 });
 

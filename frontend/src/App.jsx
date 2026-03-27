@@ -20,6 +20,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<UserAuth />} />
+            <Route path="/register" element={<UserAuth isLogin={false} />} />
             <Route path="/admin-login" element={<AdminAuth />} />
             
             <Route 

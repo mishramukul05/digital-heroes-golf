@@ -5,8 +5,8 @@ import { Lock, Mail, User, ArrowRight, Frown, Sparkles } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const UserAuth = () => {
-  const [isLogin, setIsLogin] = useState(true);
+const UserAuth = ({ isLogin: isLoginProp = true }) => {
+  const [isLogin, setIsLogin] = useState(isLoginProp);
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
